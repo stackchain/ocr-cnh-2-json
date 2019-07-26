@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>CNH OCR to JSON object</title>
+    <style>
+      html,
+        body {
+          height: 100%;
+        }
+
+        body {
+          display: -ms-flexbox;
+          display: flex;
+          -ms-flex-align: center;
+          align-items: center;
+          padding-top: 40px;
+          padding-bottom: 40px;
+          background-color: #f5f5f5;
+        }
+
+        .form-signin {
+          width: 100%;
+          max-width: 420px;
+          padding: 15px;
+          margin: auto;
+        }
+
+        .form-label-group {
+          position: relative;
+          margin-bottom: 1rem;
+        }
+
+        .form-label-group > input,
+        .form-label-group > label {
+          height: 3.125rem;
+          padding: .75rem;
+        }
+
+        .form-label-group > label {
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: block;
+          width: 100%;
+          margin-bottom: 0; /* Override default `<label>` margin */
+          line-height: 1.5;
+          color: #495057;
+          pointer-events: none;
+          cursor: text; /* Match the input under the label */
+          border: 1px solid transparent;
+          border-radius: .25rem;
+          transition: all .1s ease-in-out;
+        }
+
+        .form-label-group input::-webkit-input-placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input:-ms-input-placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input::-ms-input-placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input::-moz-placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input::placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input:not(:placeholder-shown) {
+          padding-top: 1.25rem;
+          padding-bottom: .25rem;
+        }
+
+        .form-label-group input:not(:placeholder-shown) ~ label {
+          padding-top: .25rem;
+          padding-bottom: .25rem;
+          font-size: 12px;
+          color: #777;
+        }
+
+        /* Fallback for Edge
+        -------------------------------------------------- */
+        @supports (-ms-ime-align: auto) {
+          .form-label-group > label {
+            display: none;
+          }
+          .form-label-group input::-ms-input-placeholder {
+            color: #777;
+          }
+        }
+
+        /* Fallback for IE
+        -------------------------------------------------- */
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+          .form-label-group > label {
+            display: none;
+          }
+          .form-label-group input:-ms-input-placeholder {
+            color: #777;
+          }
+        }
+        .bd-placeholder-img {
+          font-size: 1.125rem;
+          text-anchor: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+  
+        @media (min-width: 768px) {
+          .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+          }
+        }
+      </style>
+</head>
+<body>
+  <form class="form-signin">
+
+  <div class="text-center mb-4">
+    <h1 class="h3 mb-3 font-weight-normal">OCR to CNH auto KYC</h1>
+    <p>Build an auto KYC <a href="https://"></a></p>
+  </div>
+
+  <div class="text-center mb-4">
+      <input type="file" id="file" class="form-control">
+  </div>
+
+  <div class="text-center mb-4">
+      
+      <button class="btn btn-lg btn-primary btn-block" type="button" onclick="_post_image()">
+        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+        Ler a CNH
+      </button>
+  </div>
+
+  <div class="form-label-group">
+    <input type="text" id="input-nome" class="form-control" placeholder="Nome" required="" autofocus="">
+    <label for="input-nome">Nome</label>
+  </div>
+
+  <div class="form-label-group">
+    <input type="text" id="input-cpf" class="form-control" placeholder="CPF" required="">
+    <label for="input-cpf">CPF</label>
+  </div>
+
+  <div class="form-label-group">
+      <input type="text" id="input-mae" class="form-control" placeholder="Nome da Mae" required="">
+      <label for="input-mae">Nome da Mae</label>
+    </div>
+
+    <div class="form-label-group">
+        <input type="text" id="input-nasc" class="form-control" placeholder="Data de Nascimento" required="">
+        <label for="input-nasc">Data de Nascimento</label>
+      </div>
+  
+
+    <div class="text-center mb-4">
+        <img class="mb-4" id="avatar" src="" alt="" width="60" height="60">
+    </div>
+
+  <div class="checkbox mb-3">
+    <label>
+      <input type="checkbox" value="remember-me"> Remember me
+    </label>
+  </div>
+  <p class="mt-5 mb-3 text-muted text-center">© 2019</p>
+</form>
+
+<script>
+  function _post_image() {
+    let formData = new FormData();
+    let fileField = document.querySelector('input[type="file"]');
+    let file = fileField.files[0]
+
+    if (!file) alert('ERROR: Select a file.')
+
+    formData.append('file', file);
+
+    fetch('/cnh.json', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => { 
+      r = JSON.parse(response)
+      document.getElementById('input-nome').value = r.nome;
+      document.getElementById('input-cpf').value = r.cpf;
+      document.getElementById('input-mae').value = r.mae;
+      document.getElementById('input-nasc').value = r.dt_nasc;
+      if (r.avatar) {
+        document.getElementById('avatar').src = "data:image/jpg;base64," + r.avatar
+      } else {
+        document.getElementById('avatar').src = ""
+      }
+      console.log(response);
+    });
+
+  }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
