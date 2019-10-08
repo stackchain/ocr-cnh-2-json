@@ -78,9 +78,6 @@ This request shall return a JSON with the following format:
 }
 ```
 
-# Credits (author)
+# Contributors
 
-**Thanks a lot to the original author of this project:** 
-
- - **[Juliano Lazzarotto](https://github.com/stackchain)** ([his LinkedIn profile](https://www.linkedin.com/in/juliano-lazzarotto/)).
-
+[Check out what and whom did which part of this project.](CONTRIBUTORS.md)
