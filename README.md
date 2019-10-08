@@ -28,6 +28,56 @@ Any problems you may have you should take a look at the logs (`docker logs {cont
 
 At this point you're ready to go. Just access `http://localhost:8080` and you should see a nice and friendly form to test this service :)
 
+## Using the service
+
+As said, this is a very simple service, with a even simpler use dynamic:
+ - You send (upload within a POST `multipart/form-data` request) the document (CNH) image;
+ - The service will return you a JSON with the document information (or not - depends on the quality of the document and image)
+
+### Usage example (in JavaScript)
+
+The following code snippet examplifies how to use the API:
+
+```javascript
+import fetch from 'fetch';
+
+let formData = new FormData();
+let fileField = document.querySelector('input[type="file"]');
+let file = fileField.files[0]
+
+if (!file) alert('ERROR: Select a file.')
+
+formData.append('file', file);
+
+try {
+    const rawResponse = await fetch('/cnh.json', { method: 'POST', body: formData });
+    const response = rawResponse.json();
+    console.log(response);
+} catch (error) {
+    console.error(error);
+}
+```
+
+This request shall return a JSON with the following format:
+```json
+{
+	"nome": "XXXXXXXXXXXXXXX",
+	"cpf": "XXXXXXXX",
+	"dt_nasc": "XXXXXXXX",
+	"rg": "XXXXXXXX",
+	"rg_emissor": "XXXXXXXX",
+	"rg_uf": "XXXXXXXX",
+	"numero": "XXXXXXXX",
+	"cidade": "XXXXXXXX",
+	"uf": "XXXXXXXX",
+	"pai": "XXXXXXXX",
+	"mae": "XXXXXXXX",
+	"emissao": "XXXXXXXX",
+	"validade": "XXXXXXXX",
+	"avatar": "XXXXXXXX"
+}
+```
+
 # Credits (author)
 
 **Thanks a lot to the original author of this project:** 
