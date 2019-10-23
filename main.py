@@ -145,18 +145,18 @@ def textClassifier(data, text, ratio):
   if (3.3 <= ratio <= 5 and data["nome"] is not None):
     if (textSize > 12 and text.find("-") and text.find(".")):
       if (data["cpf"] is None):
-        data["cpf"] = text.replace(",", ".")
+        data["cpf"] = "".join(text.replace(",", ".").split())
     if (textSize == 10 and text.find("/")):
       dateObj = validDateString(text.strip())
       if (isinstance(dateObj, datetime.datetime)):
         now = datetime.datetime.now()
         legalAge = datetime.datetime.now() - datetime.timedelta(days=365*18)
         if (data["dt_nasc"] is None and dateObj < legalAge):
-          data["dt_nasc"] = text
+          data["dt_nasc"] = "".join(text.split())
         if (data["validade"] is None and dateObj > now):
-          data["validade"] = text
+          data["validade"] = "".join(text.split())
         if (data["emissao"] is None and dateObj > legalAge and dateObj < now):
-          data["emissao"] = text
+          data["emissao"] = "".join(text.split())
   # expect cnh number
   if (5.1 <= ratio <= 7.1 and data['numero'] is None):
     numbers = re.findall(r"(\d{11})", text)
@@ -176,7 +176,7 @@ def textClassifier(data, text, ratio):
           elif (2 <= size <= 6):
             data["rg_emissor"] = d
           elif (size > 6):
-            data["rg"] = d
+            data["rg"] = "".join(d.split())
 
   # if (10.1 <= ratio <= 12.4):
   #   if (data["cidade"] is None):
@@ -237,11 +237,11 @@ def grabFace(image, meanAngle):
   for (x, y, w, h) in face_cascade.detectMultiScale(gray, 1.3, 5):
     area = w * h
     radius = int(h * 0.75)
-    cx = (x+h/2)
-    cy = (y+w/2)
+    cx = int(x+h/2)
+    cy = int(y+w/2)
     # TODO: magic numbers everywhere, so sad
     if (area > 5000 and area < 20000):
-      #cv2.circle(gray, center, radius, (255, 0, 255))
+      #cv2.circle(gray, (int(cx), int(cy)), radius, (255, 0, 255))
       crop = image[cy-radius:(cy-radius+2*radius), cx-radius:(cx-radius+2*radius)]
       return crop
 
@@ -263,8 +263,8 @@ data = readRois(rois, meanAngle, stdAngle)
 # stage 5 detect face
 face = grabFace(resize_orig, meanAngle)
 if (face is not None):
-  retval, imgBuffer = cv2.imencode(".jpg", imutils.resize(face, 60))
-  data["avatar"] = base64.b64encode(imgBuffer)
+  retval, imgBuffer = cv2.imencode(".jpg", imutils.resize(face, 120))
+  data["avatar"] = base64.b64encode(imgBuffer).decode("utf-8")
 
 # stage 6 return the json
 print(json.dumps(data))

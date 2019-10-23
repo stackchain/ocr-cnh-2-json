@@ -160,13 +160,38 @@
     </div>
 
     <div class="form-label-group">
+      <input type="text" id="input-pai" class="form-control" placeholder="Nome da Pai" required="">
+      <label for="input-pai">Nome da Pai</label>
+    </div>
+
+    <div class="form-label-group">
+      <input type="text" id="input-numero" class="form-control" placeholder="Numero CNH" required="">
+      <label for="input-numero">Numero CNH</label>
+    </div>
+
+    <div class="form-label-group">
+        <input type="text" id="input-emissao" class="form-control" placeholder="Data de Emissao" required="">
+        <label for="input-emissao">Emissao CNH</label>
+      </div>
+
+    <div class="form-label-group">
         <input type="text" id="input-nasc" class="form-control" placeholder="Data de Nascimento" required="">
         <label for="input-nasc">Data de Nascimento</label>
+      </div>
+
+      <div class="form-label-group">
+        <input type="text" id="input-rg" class="form-control" placeholder="RG #" required="">
+        <label for="input-rg">RG (identidade)</label>
+      </div>
+
+      <div class="form-label-group">
+        <input type="text" id="input-emissor" class="form-control" placeholder="Emissor" required="">
+        <label for="input-emissor">Emissor</label>
       </div>
   
 
     <div class="text-center mb-4">
-        <img class="mb-4" id="avatar" src="" alt="" width="60" height="60">
+        <img class="mb-4" id="avatar" src="" alt="" width="120" height="120">
     </div>
 
   <div class="checkbox mb-3">
@@ -199,6 +224,12 @@
       document.getElementById('input-cpf').value = r.cpf;
       document.getElementById('input-mae').value = r.mae;
       document.getElementById('input-nasc').value = r.dt_nasc;
+      document.getElementById('input-pai').value = r.pai;
+      document.getElementById('input-numero').value = r.numero;
+      document.getElementById('input-emissao').value = r.emissao;
+      document.getElementById('input-rg').value = r.rg;
+      document.getElementById('input-emissor').value = r.rg_emissor + '/' + r.rg_uf;
+
       if (r.avatar) {
         document.getElementById('avatar').src = "data:image/jpg;base64," + r.avatar
       } else {
