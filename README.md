@@ -1,9 +1,9 @@
 # ocr-cnh-2-json
-OCR for Brazilian CNH (Drivers license) to JSON object.
+OCR for Brazilian CNH (driver's license) to JSON object.
 
 ## Getting started
 
-The simplest and fast-forward way to get started with this project in 2 steps is: 
+The simplest way to get started with this project in 2 steps:
 
 ### Build the docker container
 
@@ -11,28 +11,28 @@ The simplest and fast-forward way to get started with this project in 2 steps is
 docker build -t ocr-cnh .
 ```
 
-It may take a while as the `Dockerfile` compile and install several OS native libraries to run the service.
+It may take a while as the `Dockerfile` compiles and install several OS native libraries to run the service.
 
-### Run the builded container
+### Run the container
 
-After waiting for the build, just run an instance of the container by executing:
+After the building, just run an instance of the container by executing:
 
 ```
 docker run -it -d -p 8080:8080 ocr-cnh
 ```
 
 You can check if the container is running accordingly by executing the `docker ps`.
-Any problems you may have you should take a look at the logs (`docker logs {container_name_or_id}`)
+Don't forget take a look at the logs (`docker logs {container_name_or_id}`)
 
 ### Ready to go!
 
-At this point you're ready to go. Just access `http://localhost:8080` and you should see a nice and friendly form to test this service :)
+At this point you're ready to go. Just access `http://localhost:8080` and you should see a nice and friendly form to test it :)
 
 ## Using the service
 
 As said, this is a very simple service, with a even simpler use dynamic:
  - You send (upload within a POST `multipart/form-data` request) the document (CNH) image;
- - The service will return you a JSON with the document information (or not - depends on the quality of the document and image)
+ - The service will return you a JSON with the document information (or not - it depends on the quality of the document and image)
 
 ### Usage example (in JavaScript)
 
@@ -58,7 +58,7 @@ try {
 }
 ```
 
-This request shall return a JSON with the following format:
+This request will return a JSON with the following format:
 ```json
 {
 	"nome": "XXXXXXXXXXXXXXX",
@@ -80,4 +80,4 @@ This request shall return a JSON with the following format:
 
 # Contributors
 
-[Check out what and whom did which part of this project.](CONTRIBUTORS.md)
+[Contributors.](CONTRIBUTORS.md)
