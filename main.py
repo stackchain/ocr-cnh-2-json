@@ -263,7 +263,7 @@ data = readRois(rois, meanAngle, stdAngle)
 # stage 5 detect face
 face = grabFace(resize_orig, meanAngle)
 if (face is not None):
-  retval, imgBuffer = cv2.imencode(".jpg", imutils.resize(face, 120))
+  retval, imgBuffer = cv2.imencode(".jpg", imutils.resize(face, 240))
   data["avatar"] = base64.b64encode(imgBuffer).decode("utf-8")
 
 # stage 6 return the json

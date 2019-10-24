@@ -12,8 +12,12 @@ a.use(e.static('public'))
 
 const runPy = file => new Promise(function(resolve, reject) {
   const p = s('python', ['-W', 'ignore', 'main.py', '--image', `${file}`]);
-  p.stdout.on('data', function(data) {
-      resolve(data);
+  let buf = '';
+  p.stdout.on('data', data => {
+     buf += data
+  });
+  p.stdout.on('end', data => {
+    resolve(buf);
   });
   p.stderr.on('data', (data) => {
       reject(data);

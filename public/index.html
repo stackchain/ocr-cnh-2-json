@@ -11,6 +11,12 @@
           height: 100%;
         }
 
+        #overlay, .overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+
         body {
           display: -ms-flexbox;
           display: flex;
@@ -129,7 +135,7 @@
 
   <div class="text-center mb-4">
     <h1 class="h3 mb-3 font-weight-normal">OCR to CNH auto KYC</h1>
-    <p>Build an auto KYC <a href="https://"></a></p>
+    <p>Build an auto KYC</p>
   </div>
 
   <div class="text-center mb-4">
@@ -137,9 +143,8 @@
   </div>
 
   <div class="text-center mb-4">
-      
       <button class="btn btn-lg btn-primary btn-block" type="button" onclick="_post_image()">
-        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+        <span id="spinnerCNH" class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
         Ler a CNH
       </button>
   </div>
@@ -188,22 +193,43 @@
         <input type="text" id="input-emissor" class="form-control" placeholder="Emissor" required="">
         <label for="input-emissor">Emissor</label>
       </div>
-  
 
-    <div class="text-center mb-4">
-        <img class="mb-4" id="avatar" src="" alt="" width="120" height="120">
+
+    <div style="position: relative; min-height: 240px;">
+        <img class="mb-4" id="avatar" src="" alt="" width="240" height="240">
+        <canvas id="avatarOverlay" class="overlay" width="240" height="240"></canvas>
     </div>
 
-  <div class="checkbox mb-3">
-    <label>
-      <input type="checkbox" value="remember-me"> Remember me
-    </label>
-  </div>
-  <p class="mt-5 mb-3 text-muted text-center">© 2019</p>
+    <div id="match">
+      <span>Selfie</span>
+      <div class="text-center mb-4">
+        <input type="file" id="file-selfie" class="form-control"  onchange="_readURL(this)">
+      </div>
+    </div>
+
+    <div class="text-center mb-4">
+        <button class="btn btn-lg btn-primary btn-block" type="button" onclick="_match()">        
+          <span id="spinnerMatch" class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+          Comparar selfie X CNH 
+        </button>        
+    </div>
+
+    <div style="position: relative; min-height: 240px;" >
+        <img class="mb-4" id="selfie" src="" alt="" width="240" height="240">
+        <canvas id="overlay" width="240" height="240"></canvas>
+    </div>
+
+    <div id="alert" class="alert alert-light">
+      <strong>Certeza: <span id="similarity">0%</span></strong>
+    </div>
+
+  <p class="mt-5 mb-3 text-muted text-center">Made with 💦 by <a href="https://linkedin.com/in/juliano-lazzarotto" target="_blank">stackchain</a> © 2019</p>
 </form>
+<script src="js/face-api.min.js"></script>
+<script src="js/faceDetectionControls.js"></script>
 
 <script>
-  function _post_image() {
+  async function _post_image() {
     let formData = new FormData();
     let fileField = document.querySelector('input[type="file"]');
     let file = fileField.files[0]
@@ -218,7 +244,7 @@
     })
     .then(response => response.json())
     .catch(error => console.error('Error:', error))
-    .then(response => { 
+    .then(response => {
       r = JSON.parse(response)
       document.getElementById('input-nome').value = r.nome;
       document.getElementById('input-cpf').value = r.cpf;
@@ -235,10 +261,82 @@
       } else {
         document.getElementById('avatar').src = ""
       }
-      console.log(response);
+      // console.log(response);
     });
 
   }
+
+  
+  async function _match() {
+    const alertEl = document.getElementById("alert");
+    const spinnerEl = document.getElementById("spinnerMatch");
+    const similarityEl = document.getElementById("similarity");
+    const selfieImgEl = document.getElementById("selfie");
+    const canvasEl = document.getElementById("overlay");
+    const avatarImgEl = document.getElementById("avatar");
+    const canvasAvatarEl = document.getElementById("avatarOverlay");
+    const options = getFaceDetectorOptions();
+    const selfieDetection = await faceapi
+      .detectSingleFace(selfieImgEl, options)
+      .withFaceLandmarks()
+      .withFaceDescriptor()
+
+    if (!selfieDetection) { 
+      alert('wops, try a better selfie image') 
+      return;
+    }
+
+    const avatarDetection = await faceapi
+      .detectSingleFace(avatarImgEl, options)
+      .withFaceLandmarks()
+      .withFaceDescriptor()
+
+    if (!avatarDetection) { 
+      alert('wops, try a better avatar image') 
+      return;
+    }
+
+    const selfieResize = faceapi.resizeResults(selfieDetection, selfieImgEl)
+    const avatarResize = faceapi.resizeResults(avatarDetection, avatarImgEl)
+    
+    faceapi.matchDimensions(canvasEl, selfieImgEl)
+    faceapi.matchDimensions(canvasAvatarEl, avatarImgEl)
+
+    faceapi.draw.drawDetections(canvasEl, selfieResize);
+    faceapi.draw.drawDetections(canvasAvatarEl, avatarResize);
+
+    const distance = faceapi.round(faceapi.euclideanDistance(selfieDetection.descriptor, avatarDetection.descriptor));
+
+    const threshold = 0.50
+    
+
+    if (distance < 0.20) { // too close, probably same photo
+      alertEl.classList.remove("alert-light", "alert-danger", "alert-succes");
+      alertEl.classList.add("alert-warning");
+      similarityEl.textContent = `${(1 - distance).toFixed(1)} NAO ACEITAR - MESMA FOTO`
+    } else if (distance > threshold) {
+      alertEl.classList.remove("alert-light", "alert-succes", "alert-warning");
+      alertEl.classList.add("alert-danger");
+      similarityEl.textContent = `${(1 - distance).toFixed(1)} NAO ACEITAR`
+    } else {
+      alertEl.classList.remove("alert-light", "alert-danger", "alert-warning");
+      alertEl.classList.add("alert-success");
+      similarityEl.textContent = `${(1 - distance).toFixed(1)} ACEITAR`
+    }
+  }
+
+  async function _readURL(input) {
+    if (input.files && input.files[0]) {
+      let reader = new FileReader();
+    
+      reader.onload = function(e) {
+        document.getElementById("selfie").setAttribute('src', e.target.result);
+      }    
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+  loadFaceDetector();
 </script>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
