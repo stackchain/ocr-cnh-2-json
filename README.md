@@ -1,5 +1,5 @@
 # ocr-cnh-2-json
-OCR for Brazilian CNH (driver's license) to JSON object. It will try to read all the driver's license data, and allows you to compare match the similarity of a selfie against the document photo.
+OCR for Brazilian CNH (driver's license) to JSON object. It will try to read all the driver's license data, and allows you to compare/match by the similarity of a selfie against the document photo.
 
 ## Getting started
 
